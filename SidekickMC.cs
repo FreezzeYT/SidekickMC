@@ -8,7 +8,7 @@ using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-class MouseControls : ApplicationContext {
+class SidekickMC : ApplicationContext {
     delegate IntPtr Hook(int code, IntPtr message, IntPtr data);
     [DllImport("user32", SetLastError=true)] static extern IntPtr SetWindowsHookEx(int kind, Hook callback, IntPtr module, uint thread);
     [DllImport("kernel32")] static extern IntPtr GetModuleHandle(string name);
@@ -21,7 +21,8 @@ class MouseControls : ApplicationContext {
     readonly Control dispatcher = new Control();
     readonly Icon appIcon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
     readonly NotifyIcon tray = new NotifyIcon();
-    readonly string settings = Path.Combine(Application.LocalUserAppDataPath,"buttons.txt");
+    readonly string settings = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"SidekickMC","buttons.txt");
+    readonly string legacySettings = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"MouseControls","MouseControls","0.0.0.0","buttons.txt");
     readonly string[] modes = {"Volume","Brightness"};
     readonly SettingsWindow settingsWindow;
     readonly ToolStripMenuItem controlsToggle;
@@ -44,7 +45,7 @@ class MouseControls : ApplicationContext {
         PostMessage(window,0x319,window,(IntPtr)((0x8000 | button)<<16));
     }
     readonly bool startInBackground;
-    MouseControls(bool startInBackground) {
+    SidekickMC(bool startInBackground) {
         this.startInBackground=startInBackground;
         brightnessTimer.Tick += delegate {
             if(brightnessSteps.Count>0) FlushBrightness();
@@ -55,6 +56,10 @@ class MouseControls : ApplicationContext {
             }
         };
         var handle = dispatcher.Handle;
+        if(!File.Exists(settings) && File.Exists(legacySettings)){
+            Directory.CreateDirectory(Path.GetDirectoryName(settings));
+            File.Copy(legacySettings,settings);
+        }
         if(File.Exists(settings)){
             var saved=File.ReadAllLines(settings);
             snippingEnabled=saved.Length<3 || saved[2]!="Off";
@@ -75,7 +80,7 @@ class MouseControls : ApplicationContext {
         callback=OnMouse;
         hook=SetWindowsHookEx(14,callback,GetModuleHandle(null),0);
         if(hook==IntPtr.Zero) throw new System.ComponentModel.Win32Exception();
-        tray.Icon=appIcon; tray.Text="Mouse Controls"; tray.ContextMenuStrip=menu; tray.Visible=true;
+        tray.Icon=appIcon; tray.Text="SidekickMC"; tray.ContextMenuStrip=menu; tray.Visible=true;
         UpdateControlsToggle();
         tray.MouseClick+=delegate(object sender, MouseEventArgs e){if(e.Button==MouseButtons.Left) settingsWindow.Open();};
         if(!startInBackground) settingsWindow.Open();
@@ -98,8 +103,9 @@ class MouseControls : ApplicationContext {
     }
     void WriteStartupEntry(bool enabled){
         using(RegistryKey run=Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run")){
-            if(enabled) run.SetValue("MouseControls","\""+Application.ExecutablePath+"\" --background");
-            else run.DeleteValue("MouseControls",false);
+            if(enabled) run.SetValue("SidekickMC","\""+Application.ExecutablePath+"\" --background");
+            else run.DeleteValue("SidekickMC",false);
+            run.DeleteValue("MouseControls",false);
         }
     }
     void SetControlsEnabled(bool enabled){
@@ -119,11 +125,14 @@ class MouseControls : ApplicationContext {
         controlsToggle.Checked=controlsEnabled;
     }
     void SaveSettings(){
-        try{File.WriteAllLines(settings,new[]{modes[0],modes[1],snippingEnabled?"Snipping Tool":"Off",startWithWindows?"Start with Windows":"Manual start",controlsEnabled?"Enabled":"Disabled"});}
+        try{
+            Directory.CreateDirectory(Path.GetDirectoryName(settings));
+            File.WriteAllLines(settings,new[]{modes[0],modes[1],snippingEnabled?"Snipping Tool":"Off",startWithWindows?"Start with Windows":"Manual start",controlsEnabled?"Enabled":"Disabled"});
+        }
         catch(IOException ex){Notify("Could not save settings. "+ex.Message);}
         catch(UnauthorizedAccessException ex){Notify("Could not save settings. "+ex.Message);}
     }
-    void Notify(string message){tray.ShowBalloonTip(2500,"Mouse Controls",message,ToolTipIcon.Info);}
+    void Notify(string message){tray.ShowBalloonTip(2500,"SidekickMC",message,ToolTipIcon.Info);}
     IntPtr OnMouse(int code, IntPtr message, IntPtr data){
         if(!controlsEnabled) return CallNextHookEx(hook,code,message,data);
         int msg=message.ToInt32();
@@ -220,11 +229,11 @@ class MouseControls : ApplicationContext {
     protected override void ExitThreadCore(){UnhookWindowsHookEx(hook);brightnessTimer.Dispose();settingsWindow.Dispose();tray.Dispose();appIcon.Dispose();dispatcher.Dispose();base.ExitThreadCore();}
     [STAThread] static void Main(){
         bool first;
-        using(var mutex=new System.Threading.Mutex(true,"Local\\MouseControls.SideButtons",out first)){
+        using(var mutex=new System.Threading.Mutex(true,"Local\\SidekickMC.SideButtons",out first)){
             if(!first){SettingsWindow.PostMessage((IntPtr)0xffff,SettingsWindow.OpenMessage,IntPtr.Zero,IntPtr.Zero);return;}
             SetProcessDPIAware();Application.EnableVisualStyles();
             bool background=Array.IndexOf(Environment.GetCommandLineArgs(),"--background")>=0;
-            try{Application.Run(new MouseControls(background));}catch(Exception ex){MessageBox.Show(ex.Message,"Mouse Controls");}
+            try{Application.Run(new SidekickMC(background));}catch(Exception ex){MessageBox.Show(ex.Message,"SidekickMC");}
         }
     }
 }

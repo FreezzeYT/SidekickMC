@@ -1,8 +1,8 @@
-# How Mouse Controls works
+# How SidekickMC works
 
 ## Language and structure
 
-The application is written in C# using .NET Framework and Windows Forms. [MouseControls.cs](MouseControls.cs) manages the tray icon, mouse hook and Windows actions. [SettingsWindow.cs](SettingsWindow.cs) builds the settings window. The build embeds [MouseControls.ico](MouseControls.ico) into the executable. The tray and settings window use the icon from that executable.
+The application is written in C# using .NET Framework and Windows Forms. [SidekickMC.cs](SidekickMC.cs) manages the tray icon, mouse hook and Windows actions. [SettingsWindow.cs](SettingsWindow.cs) builds the settings window. The build embeds [SidekickMC.ico](SidekickMC.ico) into the executable. The tray and settings window use the icon from that executable.
 
 ## Recognizing gestures
 

@@ -1,14 +1,14 @@
-# Mouse Controls
+# SidekickMC
 
 A small C# tray app for Windows laptops. Hold either mouse side button and scroll to adjust volume or screen brightness. Press both together to open Windows screen snipping.
 
-![Mouse Controls — volume, brightness and screen snipping](assets/banner.png)
+![SidekickMC — volume, brightness and screen snipping](assets/banner.png)
 
 ## Getting started
 
-Run **MouseControls.exe** and choose an action for each side button. Changes apply immediately. Close the window to keep the gestures running. Click the mouse icon in the notification area to reopen settings, or right-click it and choose **Exit** to quit.
+Run **SidekickMC.exe** and choose an action for each side button. Changes apply immediately. Close the window to keep the gestures running. Click the mouse icon in the notification area to reopen settings, or right-click it and choose **Exit** to quit.
 
-Enable **Start with Windows** in settings to run Mouse Controls after you sign in. The tray menu also includes **Enable controls** and **Disable controls**. Disabling controls leaves your side buttons and wheel in their normal Windows behavior while the app stays available in the tray.
+Enable **Start with Windows** in settings to run SidekickMC after you sign in. The tray menu also includes **Enable controls** and **Disable controls**. Disabling controls leaves your side buttons and wheel in their normal Windows behavior while the app stays available in the tray.
 
 | Gesture | Default action |
 | --- | --- |
@@ -31,7 +31,7 @@ Exit the running app from the tray menu, then run the following from the project
 
 ```powershell
 .\build.cmd
-.\MouseControls.exe
+.\SidekickMC.exe
 ```
 
 See the [implementation guide](HOW-IT-WORKS.md) for the input handling, Windows APIs and settings format.

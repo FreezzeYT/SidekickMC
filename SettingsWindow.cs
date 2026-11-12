@@ -9,7 +9,7 @@ sealed class SettingsWindow : Form {
     readonly Color accent = Color.FromArgb(156, 232, 206);
     readonly CheckBox startupToggle;
     bool updatingStartup;
-    internal static readonly uint OpenMessage = RegisterWindowMessage("MouseControls.OpenSettings.1");
+    internal static readonly uint OpenMessage = RegisterWindowMessage("SidekickMC.OpenSettings.1");
     [System.Runtime.InteropServices.DllImport("user32", CharSet=System.Runtime.InteropServices.CharSet.Unicode)]
     static extern uint RegisterWindowMessage(string name);
     [System.Runtime.InteropServices.DllImport("user32")]
@@ -17,7 +17,7 @@ sealed class SettingsWindow : Form {
 
     internal SettingsWindow(string[] modes, bool snip, bool startWithWindows, Action<int,string> save, Action<bool> saveStartup){
         SuspendLayout();
-        Text = "Mouse Controls";
+        Text = "SidekickMC";
         Font = new Font("Segoe UI", 10);
         BackColor = canvas;
         ForeColor = Color.White;
@@ -27,7 +27,7 @@ sealed class SettingsWindow : Form {
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
         StartPosition = FormStartPosition.CenterScreen;
-        AddLabel(this,"Mouse controls",24,18,520,48,24,Color.White,true);
+        AddLabel(this,"SidekickMC",24,18,520,48,24,Color.White,true);
         AddLabel(this,"Hold a side button and scroll to adjust its assigned control.",26,72,553,28,10,muted,false);
         AddRow(110,"Back button","Hold and scroll",new[]{"Volume","Brightness"},modes[0],0,save);
         AddRow(186,"Forward button","Hold and scroll",new[]{"Volume","Brightness"},modes[1],1,save);
