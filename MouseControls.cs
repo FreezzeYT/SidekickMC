@@ -13,7 +13,6 @@ class MouseControls : ApplicationContext {
     [DllImport("user32")] static extern bool UnhookWindowsHookEx(IntPtr hook);
     [DllImport("user32")] static extern IntPtr CallNextHookEx(IntPtr hook,int code,IntPtr message,IntPtr data);
     [DllImport("user32")] static extern void keybd_event(byte key,byte scan,uint flags,UIntPtr extra);
-    [DllImport("user32")] static extern void mouse_event(uint flags,int x,int y,uint data,UIntPtr extra);
     [DllImport("user32")] static extern bool SetProcessDPIAware();
 
     readonly Hook callback;
@@ -26,7 +25,16 @@ class MouseControls : ApplicationContext {
     bool snippingEnabled=true;
     IntPtr hook;
     int held, started, remainder;
-    bool chord, scrolled;
+    bool chord, scrolled, snipOnRelease;
+    [DllImport("user32")] static extern IntPtr GetForegroundWindow();
+    [DllImport("user32")] static extern bool PostMessage(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+    static void Navigate(int button){
+        IntPtr window=GetForegroundWindow();
+        if(window==IntPtr.Zero) return;
+        // WM_APPCOMMAND, mouse origin, browser Back (1) or Forward (2).
+        PostMessage(window,0x319,window,(IntPtr)((0x8000 | button)<<16));
+    }
     MouseControls() {
         var handle = dispatcher.Handle;
         if(File.Exists(settings)){
@@ -75,14 +83,21 @@ class MouseControls : ApplicationContext {
                     if(held==0){started=now; remainder=0; scrolled=false;}
                     if((held&value)==0 && held!=0 && !chord){
                         chord=true;
-                        if(snippingEnabled && elapsed<=300) dispatcher.BeginInvoke(new Action(OpenSnippingOverlay));
+                        snipOnRelease=snippingEnabled && elapsed<=300;
                     }
                     held|=value;
+                    // Consume both edges so a gesture never leaves Windows holding a button.
                 } else if((held&value)!=0){
                     bool tap=!chord && !scrolled;
                     held&=~value;
-                    if(held==0) chord=false;
-                    if(tap){mouse_event(128,0,0,(uint)value,UIntPtr.Zero);mouse_event(256,0,0,(uint)value,UIntPtr.Zero);}
+                    if(tap) Navigate(value);
+                    if(held==0){
+                        chord=false;
+                        if(snipOnRelease){
+                            snipOnRelease=false;
+                            dispatcher.BeginInvoke(new Action(OpenSnippingOverlay));
+                        }
+                    }
                 } else return CallNextHookEx(hook,code,message,data);
                 return (IntPtr)1;
             }

@@ -8,7 +8,7 @@ The application is written in C# using .NET Framework and Windows Forms. [MouseC
 
 A low-level Windows mouse hook tracks the Back and Forward buttons and vertical wheel input. Holding one button makes the first full wheel step trigger its assigned action. The hook accumulates smaller wheel deltas until they add up to a step and consumes the scroll so the underlying app stays in place.
 
-If the user releases a single button without scrolling, the app replays its Back or Forward click. The hook ignores injected mouse events so replayed clicks pass through. Pressing the second button within 300 milliseconds queues the screenshot action once when enabled. Windows actions run on the application message loop outside the hook callback.
+The hook consumes both edges of each recognized side-button press. A solo tap posts one Windows Back or Forward application command to the foreground window. A scroll gesture sends no navigation command. Pressing the second button within 300 milliseconds arms screen snipping when enabled. The app queues Snipping Tool only after both buttons are released.
 
 ## Calling Windows
 
