@@ -2,6 +2,8 @@
 
 A small C# tray app for Windows laptops. Hold either mouse side button and scroll to adjust volume or screen brightness. Press both together to open Windows screen snipping.
 
+![Mouse Controls — volume, brightness and screen snipping](assets/banner.png)
+
 ## Getting started
 
 Run **MouseControls.exe** and choose an action for each side button. Changes apply immediately. Close the window to keep the gestures running. Click the mouse icon in the notification area to reopen settings, or right-click it and choose **Exit** to quit.
@@ -14,6 +16,8 @@ Run **MouseControls.exe** and choose an action for each side button. Changes app
 | Tap either button on its own | Send the usual Back or Forward click |
 
 Either button can control volume or brightness. Set **Both buttons** to **Off** to disable screen snipping.
+
+![Default gestures: hold Back and scroll for volume, hold Forward and scroll for brightness, or press and release both buttons to snip](assets/gestures.png)
 
 ## Requirements
 
