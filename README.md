@@ -8,6 +8,8 @@ A small C# tray app for Windows laptops. Hold either mouse side button and scrol
 
 Run **MouseControls.exe** and choose an action for each side button. Changes apply immediately. Close the window to keep the gestures running. Click the mouse icon in the notification area to reopen settings, or right-click it and choose **Exit** to quit.
 
+Enable **Start with Windows** in settings to run Mouse Controls after you sign in. The tray menu also includes **Enable controls** and **Disable controls**. Disabling controls leaves your side buttons and wheel in their normal Windows behavior while the app stays available in the tray.
+
 | Gesture | Default action |
 | --- | --- |
 | Hold Back and scroll | Adjust system volume |

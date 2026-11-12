@@ -7,13 +7,15 @@ sealed class SettingsWindow : Form {
     readonly Color card = Color.FromArgb(32, 37, 44);
     readonly Color muted = Color.FromArgb(182, 192, 205);
     readonly Color accent = Color.FromArgb(156, 232, 206);
+    readonly CheckBox startupToggle;
+    bool updatingStartup;
     internal static readonly uint OpenMessage = RegisterWindowMessage("MouseControls.OpenSettings.1");
     [System.Runtime.InteropServices.DllImport("user32", CharSet=System.Runtime.InteropServices.CharSet.Unicode)]
     static extern uint RegisterWindowMessage(string name);
     [System.Runtime.InteropServices.DllImport("user32")]
     internal static extern bool PostMessage(IntPtr hwnd,uint message,IntPtr w,IntPtr l);
 
-    internal SettingsWindow(string[] modes, bool snip, Action<int,string> save){
+    internal SettingsWindow(string[] modes, bool snip, bool startWithWindows, Action<int,string> save, Action<bool> saveStartup){
         SuspendLayout();
         Text = "Mouse Controls";
         Font = new Font("Segoe UI", 10);
@@ -21,7 +23,7 @@ sealed class SettingsWindow : Form {
         ForeColor = Color.White;
         AutoScaleDimensions = new SizeF(96,96);
         AutoScaleMode = AutoScaleMode.Dpi;
-        ClientSize = new Size(596, 413);
+        ClientSize = new Size(596, 480);
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
         StartPosition = FormStartPosition.CenterScreen;
@@ -30,8 +32,31 @@ sealed class SettingsWindow : Form {
         AddRow(110,"Back button","Hold and scroll",new[]{"Volume","Brightness"},modes[0],0,save);
         AddRow(186,"Forward button","Hold and scroll",new[]{"Volume","Brightness"},modes[1],1,save);
         AddRow(262,"Both buttons","Press together",new[]{"Snipping Tool","Off"},snip?"Snipping Tool":"Off",2,save);
-        AddLabel(this,"Changes save automatically. Close this window to keep using your mouse.",26,352,546,44,10,muted,false);
+        var startupRow=new Panel { BackColor=card, Bounds=new Rectangle(24,338,548,58), AccessibleName="Startup" };
+        Controls.Add(startupRow);
+        AddLabel(startupRow,"Start with Windows",16,8,260,26,12,Color.White,true);
+        AddLabel(startupRow,"Run after you sign in",16,31,260,20,9,muted,false);
+        startupToggle=new CheckBox { Text="On", Appearance=Appearance.Button, TextAlign=ContentAlignment.MiddleCenter,
+            FlatStyle=FlatStyle.Flat, AutoSize=false, Bounds=new Rectangle(422,10,110,38), BackColor=canvas };
+        startupToggle.FlatAppearance.BorderSize=0;
+        startupToggle.FlatAppearance.CheckedBackColor=accent;
+        startupToggle.Checked=startWithWindows;
+        StyleToggle(startupToggle);
+        startupToggle.CheckedChanged+=delegate { StyleToggle(startupToggle); if(!updatingStartup) saveStartup(startupToggle.Checked); };
+        startupRow.Controls.Add(startupToggle);
+        AddLabel(this,"Changes save automatically. Close this window to keep using your mouse.",26,420,546,44,10,muted,false);
         ResumeLayout();
+    }
+
+    void StyleToggle(CheckBox toggle){
+        toggle.Text=toggle.Checked?"On":"Off";
+        toggle.ForeColor=toggle.Checked?canvas:Color.White;
+        toggle.FlatAppearance.MouseOverBackColor=toggle.Checked?accent:Color.FromArgb(73,85,96);
+    }
+    internal void SetStartWithWindows(bool enabled){
+        updatingStartup=true;
+        startupToggle.Checked=enabled;
+        updatingStartup=false;
     }
 
     void AddLabel(Control parent,string text,int x,int y,int width,int height,float size,Color color,bool bold){
