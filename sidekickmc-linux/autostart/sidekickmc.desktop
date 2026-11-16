@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=SidekickMC
+Comment=Side mouse button gestures for volume, brightness, and screen snipping
+Exec=/usr/local/bin/sidekickmc --daemon
+Terminal=false
+Categories=Utility;HardwareSettings;
+StartupNotify=false
+X-GNOME-Autostart-enabled=true

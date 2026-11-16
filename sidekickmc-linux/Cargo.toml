@@ -1,0 +1,23 @@
+[package]
+name = "sidekickmc"
+version = "1.0.0"
+edition = "2021"
+authors = ["SidekickMC Contributors"]
+description = "A lightweight Linux daemon for laptops: hold mouse side buttons and scroll to adjust volume or brightness; press both to snip."
+license = "MIT"
+
+[dependencies]
+evdev = "0.12.2"
+nix = { version = "0.27", features = ["signal", "fs", "ioctl", "process"] }
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"
+clap = { version = "4.4", features = ["derive"] }
+log = "0.4"
+env_logger = "0.10"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
