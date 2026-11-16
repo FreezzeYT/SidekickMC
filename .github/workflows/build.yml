@@ -2,9 +2,9 @@ name: Build Linux Binary
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main", "master", "feat-Linux-support" ]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "main", "master", "feat-Linux-support" ]
   workflow_dispatch:
 
 jobs:
